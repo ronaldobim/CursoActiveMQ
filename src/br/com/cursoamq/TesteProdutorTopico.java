@@ -38,6 +38,10 @@ public class TesteProdutorTopico {
 		MessageProducer producer = session.createProducer(topico);
 		for (int i = 1; i <= 10; i++) {
 			Message message = session.createTextMessage("Mensagem topico número "+i);
+			message.setBooleanProperty("ebook", true);
+			if (i == 5) {
+				message.setBooleanProperty("ebook", false);
+			}
 			producer.send(message);			
 		}
 		
