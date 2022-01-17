@@ -1,5 +1,6 @@
 package br.com.cursoamq;
 
+import java.util.Properties;
 import java.util.Scanner;
 
 import javax.jms.Connection;
@@ -19,8 +20,14 @@ public class TesteProdutor {
 	
 	public static void main(String args[]) throws NamingException, JMSException {
 		System.out.println("Iniciando TesteProdutor...");
+		//Usando classe Properties pra evitar o uso do arquivo jndi.properties
+		Properties properties = new Properties();
+		properties.setProperty("java.naming.factory.initial", "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
+		properties.setProperty("java.naming.provider.url", "tcp://localhost:61616");
+		properties.setProperty("queue.financeiro", "fila.financeiro");
+		
 		//criando conexão com active mq
-		InitialContext ct = new InitialContext();
+		InitialContext ct = new InitialContext(properties);
 		ConnectionFactory factory = (ConnectionFactory) ct.lookup("ConnectionFactory");
 		Connection connection = factory.createConnection();
 		connection.start();		
@@ -29,8 +36,10 @@ public class TesteProdutor {
 		Destination fila = (Destination) ct.lookup("financeiro");
 		
 		MessageProducer producer = session.createProducer(fila);
-		Message message = session.createTextMessage("Prdutor criando mensagem, pode ser JSON ou XML");
-		producer.send(message);
+		for (int i = 1; i <= 10; i++) {
+			Message message = session.createTextMessage("Mensagem número "+i);
+			producer.send(message);			
+		}
 		
 		System.out.println("Pressione ENTER para finalizar");
 		new Scanner(System.in).nextLine();
