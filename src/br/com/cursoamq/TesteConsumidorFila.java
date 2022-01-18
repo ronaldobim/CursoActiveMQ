@@ -24,7 +24,7 @@ public class TesteConsumidorFila {
 		Connection connection = factory.createConnection();
 		connection.start();		
 		
-		Session session = connection.createSession(false/*sem transacao*/, Session.AUTO_ACKNOWLEDGE);
+		Session session = connection.createSession(false/*sem transacao*/, Session.CLIENT_ACKNOWLEDGE);
 		Destination fila = (Destination) ct.lookup("financeiro");
 		MessageConsumer consumer = session.createConsumer(fila);
 		
@@ -32,9 +32,12 @@ public class TesteConsumidorFila {
 			
 			@Override
 			public void onMessage(Message message) {		
-				TextMessage textMessage = (TextMessage) message;
+				TextMessage textMessage = (TextMessage) message;				 			
 				try {
 					System.out.println("Recebendo msg: "+textMessage.getText());
+					//confirmação manual do recebimento da mensagem pois
+					//está usando CLIENT_ACKNOWLEDGE e não AUTO_ACKNOWLEDGE
+					message.acknowledge();
 				} catch (JMSException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
