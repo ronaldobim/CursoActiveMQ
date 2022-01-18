@@ -16,6 +16,8 @@ import javax.jms.TextMessage;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import br.com.cursoamq.model.Pedido;
+
 public class TesteProdutorTopico {
 	
 	public static void main(String args[]) throws NamingException, JMSException {
@@ -37,7 +39,9 @@ public class TesteProdutorTopico {
 		
 		MessageProducer producer = session.createProducer(topico);
 		for (int i = 1; i <= 10; i++) {
-			Message message = session.createTextMessage("Mensagem topico número "+i);
+			Pedido pedido = Pedido.builder(i);
+			System.out.println("Enviando pedido "+pedido.toJSON());
+			Message message = session.createTextMessage(pedido.toJSON());
 			message.setBooleanProperty("ebook", true);
 			if (i == 5) {
 				message.setBooleanProperty("ebook", false);
